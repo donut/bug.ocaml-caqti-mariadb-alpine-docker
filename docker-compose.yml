@@ -1,0 +1,25 @@
+version: '3.6'
+
+services:
+  app:
+    build: .
+    volumes:
+      - ./docker/app/Makefile:/app/Makefile:ro
+      - ./bin:/app/bin
+      - ./dune-project:/app/dune-project
+      - ./esy.lock:/app/esy.lock
+      - ./package.json:/app/package.json
+    depends_on:
+      - db
+
+  db: 
+    image: mariadb:10.3
+    restart: always
+    ports: [ "33066:3306" ]
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_DATABASE: goomba
+      MYSQL_USER: goomba
+      MYSQL_PASSWORD: abc123
+    volumes:
+      - ./docker/db/app.cnf:/etc/mysql/conf.d/zzz-app.cnf

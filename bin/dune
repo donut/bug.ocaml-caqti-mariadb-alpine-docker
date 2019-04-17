@@ -1,0 +1,5 @@
+(executable
+ (name main)
+ (libraries caqti caqti-lwt caqti-driver-mariadb lwt)
+ (preprocess
+  (pps lwt_ppx)))
