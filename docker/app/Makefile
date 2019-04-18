@@ -1,7 +1,43 @@
 SHELL = /bin/bash
 
-_esy:
+
+define newline
+
+
+endef
+
+EMIT = echo -e '$(subst $(newline),\n,$(1))'
+
+
+define GDATE_C_PATCH
+--- a/glib/glib/gdate.c
++++ b/glib/glib/gdate.c
+@@ -2439,6 +2439,9 @@ win32_strftime_helper (const GDate     *d,
+  *
+  * Returns: number of characters written to the buffer, or 0 the buffer was too small
+  */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++
+ gsize     
+ g_date_strftime (gchar       *s, 
+                  gsize        slen, 
+@@ -2549,3 +2552,5 @@ g_date_strftime (gchar       *s,
+   return retval;
+ #endif
+ }
++
++#pragma GCC diagnostic pop
+endef
+
+
+work/gdate.c.patch:
+	mkdir -p work
+	@$(call EMIT,$(GDATE_C_PATCH)) > $(@)
+
+_esy: work/gdate.c.patch package.json
 	esy install
+	find /root/.esy -name "gdate.c" -exec patch -N '{}' work/gdate.c.patch ';'
 
 .PHONY: clean-esy-build
 clean-esy-build: 
